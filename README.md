@@ -182,18 +182,24 @@
 
 ### Start your project with npm init
 1 - Run npm init on your working folder.
+
 2 - Configurate your package name, description, entry point, etc...
+
 3 - This will output your package.json file.
 
 ### Install required packages
 1 - We will use express and dotenv.
+
 2 - Run the following command to install them:
+
 ```
 npm i express dotenv --save
 ```
 
 ### Create your .env file, to store env variables.
+
 1 - Create file 'config.env'
+
 2 - To start, define the following:
 ```
 PORT = 3000
@@ -201,6 +207,7 @@ NODE_ENV = development
 ```
 
 ### Create your root file, app.js
+
 1 - Import express and set which port to listen to for incoming requests...
 
 ```
