@@ -271,7 +271,7 @@ app.use('/api/v1', jobs);
 
 ### Setting up the controllers
 
-- We will attach controllers/handlers to our routes. Controllers are responsible for handling incoming requests and returning responses to the client.
+We will attach controllers/handlers to our routes. Controllers are responsible for handling incoming requests and returning responses to the client.
 
 
 1 - Create a controllers folder in the src.
