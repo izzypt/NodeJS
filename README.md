@@ -206,7 +206,7 @@ PORT = 3000
 NODE_ENV = development
 ```
 
-### Create your root file, app.js
+### Create our main file, app.js
 
 1 - Import express and set which port to listen to for incoming requests...
 
@@ -218,6 +218,72 @@ NODE_ENV = development
  dotenv.config({path : './config.env'});
  
  app.listen(PORT, () => {
-    console.log(`Server listening on port ${process.env.PORT}`);
+    console.log(`Server listening on port ${process.env.PORT} in ${process.env.NODE_ENV} mode.`);
  });
  ```
+### Install nodemon as dev dependencie, it will allow you to automatically restart the server, whenever there are changes on your files.
+
+1 - Run the command to install:
+```
+npm i nodemon --save-dev
+```
+2 - On your package.json, on the 'scripts' object , add:
+```
+scripts: {
+  "start" : "node app.js"
+  "dev" : "nodemon app"
+  "prod" : "SET NODE_ENV=production & NODEMON app.js"
+}
+```
+This will allows to run 3 different commands , according to our needs/stage of development:
+  - npm run start
+  - npm run dev (to run when in development)
+  - npm run prod (to run when in production)
+
+### Creating basic route
+
+1 - Let's create a folder called routes.
+2 - Inside it , create a file called "jobs.js", it will include some of our routes and the controllers for each one.
+```
+const express = require('express');
+const routes = express.Router();
+
+//Importing jobs controller method
+const { getJobs } = require(../controllers/jobsController)
+
+router.route('/jobs').get(getJobs);
+
+module.exports = router;
+```
+3 - Now import this router in our main file , at src/app.js
+```
+const jobs = require('./routes/jobs');
+
+app.use('/api/v1', jobs);
+
+```
+
+### Setting up the controllers
+
+- We will attach controllers/handlers to our routes. Controllers are responsible for handling incoming requests and returning responses to the client.
+
+1 - Create a controllers folder in the src.
+2 - Create a 'jobControllers.js' file
+
+```
+exports.getJobs = (req, res, next) => {
+  res.status(200).json({
+    sucess: true,
+    message: 'This route will display all jobs in the future'
+  });
+}
+```
+
+### Setting up our DataBase
+
+We have 2 options
+
+- Online Database or
+- Local Database
+
+Go to https://www.mongodb.com and install MongoDB Compass.
