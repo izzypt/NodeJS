@@ -1,4 +1,4 @@
-# NodeJS Basics 101
+# NodeJS Basics 101 + Project Setup
 
 ### What is NodeJS ?
 
