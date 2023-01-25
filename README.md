@@ -1,4 +1,4 @@
-# NodeJS
+# NodeJS Basics 101
 
 ### What is NodeJS ?
 
@@ -178,16 +178,20 @@
     503 Service Unavailable
     The server is not ready to handle the request. Common causes are a server that is down for maintenance or that is overloaded. Note that together with this response, a user-friendly page explaining the problem should be sent. This response should be used for temporary conditions and the Retry-After HTTP header should, if possible, contain the estimated time before the recovery of the service. The webmaster must also take care about the caching-related headers that are sent along with this response, as these temporary condition responses should usually not be cached.
 
+
 # Basic Project Setup
 
-### Start your project with npm init
-1 - Run npm init on your working folder.
+
+### On your project folder
+
+1 - Run npm init on your working folder to start.
 
 2 - Configurate your package name, description, entry point, etc...
 
 3 - This will output your package.json file.
 
 ### Install required packages
+
 1 - We will use express and dotenv.
 
 2 - Run the following command to install them:
@@ -294,4 +298,180 @@ We have 2 options
 - Online Database or
 - Local Database
 
-Go to https://www.mongodb.com and install MongoDB Compass.
+1 - Install MongoDB community Server. Follow this link and the instructions :
+
+https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-windows/
+
+2 - Install MongoDB Compass for an aditional GUI.
+
+
+### Connecting API with DB
+
+1- In our '.env' file add a new variable, for the DB address:
+
+```
+DB_LOCAL_URI = mongodb://localhost:27017
+```
+
+1 - Inside our config folder (src/config), create a 'database.js'. 
+
+2 - We will use the mongoose package to create our models and connect to the MongoDB. So if , it is not installed yet, run :
+
+```
+npm i mongoose --save
+```
+
+
+```
+const mongoose = require('mongoose');
+
+const connectToDB = () => {
+   mongoose.connect(process.env.DB_LOCAL_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+   }).then( con => {
+      console.log(`Connected to DB with host : ${con.connection.host}`);
+   });
+}
+
+ module.exports = connectToDB
+```
+
+2 - Now we can the import the connect method we just created into our main file (app.js) and place it AFTER the dotenv.config() statement, since we are using ENV variables we need to make sure we have acess to them :
+
+
+```
+/* src/app.js*/
+
+const connectToDB = require('./config/database')
+
+connectToDB()
+```
+
+### Explaining Middlewares
+
+Middleware are functions that have access to the request object (req), the response object (res), and the next middleware function in the application's request-response cycle. These functions are used to modify req and res objects for tasks like parsing request bodies, adding response headers, etc.
+
+![image](https://user-images.githubusercontent.com/73948790/214554169-3c43a2fd-7800-4af9-a700-19a21f224d84.png)
+
+So, a simple EXAMPLE of a middleware would be something like : 
+
+```
+const middleware = (req, res, next) => {
+  console.log("Hey , I'll do something to do req or res objects and call the next middleware");
+  next()
+}
+
+
+app.use(middleware)
+```
+
+### Creating Job Model using Mongoose Schema
+
+1 - Create a models folder. (src/models)
+2- Create 'jobs.js', it will contain our jobs model.
+
+```
+const mongoose = require('mongoose')
+const validator = require('validator')
+//Validator package will be used to validate data like email, phone number, etc..
+
+//Create the job Schema
+const jobSchema = new mongoose.Schema({
+    title : {
+        type: String,
+        required: [true, 'Please enter Job title.'],
+        trim : true,
+        maxlength: [100, 'Job title can not exceed 100 characters']
+    },
+    slug : String,
+    description: {
+        typ: String,
+        required : [true, 'Please enter job description'],
+        maxlength: [1000, 'Maximum 1000 characters description.']
+    }
+    email : {
+      type: String,
+      validate : [validate.isEmail, 'Please add a valid email address']
+    },
+    address : {
+       type: String,
+       required : [true, 'Please add an address.']
+    },
+    company : {
+        type: String,
+        required : [true, 'Please add a company name.']
+    },
+    industry : {
+        type: [String],/*Array of strings*/
+        required : true,
+        enum : {
+          values : [
+              'Business',
+              'Information Technology',
+              'Banking',
+              'Education/Training',
+              'Telecommunication',
+              'Others'
+          ],
+          message : 'Please select current options for industry.'
+     },
+     jobType : {
+        type: String,
+        required : true,
+        enum : {
+            values : [
+                'Permanent',
+                'Temporary',
+                'Internship'
+            ],
+            message : "Please select correct options for job type"
+        },
+      minEducation : {
+         type: String,
+         required : true,
+         enum : {
+            values : [
+                'Bachelors',
+                'Masters',
+                'Phd'
+            ],
+            message : 'Please select correct options for Education.'
+         }
+       },
+       positions : {
+          type : Number,
+          default : 1,
+       },
+       experience : {
+          type: String,
+          required : true,
+          enum : {
+              values : [
+                  'No Experience',
+                  '1 Year - 2 Years',
+                  '2 Year - 5 Years',
+                  '5 Years +'
+              ],
+              message : "Select options for experience"
+          }
+       },
+       salary: {
+          type: Number,
+          required : [true, 'Please enter expected salary']
+       },
+       postingDate : {
+          type: Date,
+          default: Date.now
+       },
+       applicatsApplied : {
+          type : [Object],
+          select : false,
+       }
+     }
+    }
+})
+
+//Create the model based on the Schema and export it.
+module.exports = mongoose.model('Job', jobSchema)
+```
